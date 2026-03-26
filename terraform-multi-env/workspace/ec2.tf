@@ -1,22 +1,25 @@
 resource "aws_instance" "roboshop" {
-  count = 4
+  count = length(var.instances)
   # you get  var.ami_id from variables.tf file 
   ami           = var.ami_id  
 
   # you get var.instance_type from variables.tf file
-  instance_type = var.instance_type
+  instance_type = lookup(var.instance_type, terraform.workspace)
   vpc_security_group_ids = [ aws_security_group.allow_all.id]
 
   # you get var.ec2_tags from variables.tf file
-  tags = {
-    name = var.instances[count.index]
-  }
+  tags = merge(
+    var.comman_tags,
+    {
+      Name = "${var.instances[count.index]}-${terraform.workspace}"
+    }
+  )
 }
 
 
 resource "aws_security_group" "allow_all" {
   # you get var.sg_name from variables.tf file
-  name        = var.sg_name
+  name        = "${var.sg_name}-${terraform.workspace}"
 
   # you get var.sg_description from variables.tf file
   description = var.sg_description
@@ -42,5 +45,10 @@ resource "aws_security_group" "allow_all" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = var.sg_tags
+  tags = merge(
+    var.comman_tags,
+    {
+      Name = "${var.sg_name}-${terraform.workspace}"
+    }
+  )
 }

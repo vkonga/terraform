@@ -7,6 +7,14 @@ terraform {
       version = "5.98.0"
     }
   }
+
+  backend "s3" {
+    bucket = "electronic-shop-bucket"
+    key    = "workspace-demo"
+    region = "us-east-1" 
+    encrypt = true
+    use_lockfile = true
+  }
 }
 
 # Configure the AWS Provider
